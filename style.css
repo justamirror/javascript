@@ -1,0 +1,37 @@
+html {
+  height: 100%;
+  width: 100%;
+}
+body {
+  padding: 2px;
+  margin: 0;
+}
+#input {
+  white-space: pre-wrap;
+  padding-left: ;
+}
+#inputContainer {
+  padding-left: 20px;
+}
+#underlay {
+  color: transparent;
+  position: absolute;
+  top: 0;
+  left: 20px;
+  z-index: -1000;
+  white-space: pre-wrap;
+}
+.selected {
+  background-color: black;
+}
+iframe {
+  border: none;
+}
+#result {
+  white-space: pre-wrap;
+}
+#error {
+  white-space: pre-wrap;
+  color: red;
+  font-weight: bold;
+}

@@ -1,0 +1,68 @@
+<style>
+  body {
+    margin:0;padding:0;
+  }
+</style>
+<div id="output"></div>
+<script>
+  window.console = (function (){
+    function stringify(thing) {
+      if (typeof thing === 'string') {
+        return thing;
+      }
+      try {
+        return JSON.stringify(thing);
+      } catch (e) {
+        return `[${e.message}]`
+      }
+    }
+    function redefine(func, style) {
+      let styleString = '';
+      for (let key of Object.keys(style)) {
+        let real = key.replace(/[a-z][A-Z]/g, function (match) {
+          return match[0] + '-' + match[1].toLowerCase();
+        })
+        styleString += real + ':' + style[key] + ';';
+      }
+      fakeConsole[func] = function (...args) {
+        let string = '';
+        for (let arg of args) {
+          string+=stringify(arg)+' '
+        }
+        string = string.slice(0, -1);
+        let div = document.createElement('div');
+        div.innerText = string;
+        div.style = styleString;
+        output.appendChild(div);
+        window.parent.postMessage({
+          type: 'log',
+          things: args
+        })
+      }
+    }
+    let fakeConsole = {
+      ...console,
+    }
+    redefine('log', {});
+    redefine('error', {
+      color: 'red',
+      fontWeight: 'bold'
+    })
+    return fakeConsole
+  })()
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://javascript.justa6.repl.co') return;
+    output.innerText = '';
+    let makeFunctionArgs = Object.keys(e.data.args).concat([e.data.code]);
+
+    try {
+      window.parent.postMessage({
+        result: (new Function(...makeFunctionArgs))(...Object.values(e.data.args))
+      }, 'https://javascript.justa6.repl.co')
+    } catch (e) {
+      window.parent.postMessage({
+        error: e
+      }, 'https://javascript.justa6.repl.co')
+    }
+  })
+</script>
